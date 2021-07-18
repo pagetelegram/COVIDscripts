@@ -1,0 +1,41 @@
+#!/bin/bash
+#                $1        $2      $3 
+# Usage: digcp [file.csv] [State] [Pop]
+
+#define abs(p) {if (p<0) {return -p}; return p;}
+
+cat $1 | grep $2 > $2.dat
+
+tell=$2.dat
+Now=$(date)
+# x=${x//-/}
+# ${x/-/}
+# $( sed "s/-//" <<< $x )
+awk -F"," 'NR%2{p=$4;next}{print ($4-p)/$3}' $tell | sed "s/-//" > casespop.dat
+
+#printf "%s\n" ${input/-/} | awk '{ sum += $1 } END { print sum }'
+
+#awk -F"," 'NR%2{p=$5;next}{print ($5-p)}' $tell > death.dat
+gnuplot -p << EOF
+set autoscale
+set xrange [0:350]
+set style line 1 lt 1 lw 3 pt 3 linecolor rgb "red"
+set xlabel "Days, Rendered on $Now"
+set ylabel "Δ/pop"
+set title "Cases Δ/population of $3 in $2 by Page Telegram"
+set term png
+set output "$2.png"
+plot "casespop.dat"  # using 1:2 w points title "cases"
+pause -1
+EOF
+
+#gnuplot -p << EOF
+#set autoscale
+#set style line 1 lt 1 lw 3 pt 3 linecolor rgb "red"
+#set xlabel "Days"
+#set ylabel "Δ"
+#set title " Δ Deaths $2 by Page Telegram"
+#plot "death.dat"  # using 1:2 w points title "deaths"
+#pause -1
+#EOF
+

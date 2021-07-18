@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Usage: digc [file.csv] [State]
+
+cat $1 | grep $2 > $2.dat
+
+tell=$2.dat
+
+awk -F"," 'NR%2{p=$4;next}{print ($4-p)}' $tell > cases.dat
+#awk -F"," 'NR%2{p=$5;next}{print ($5-p)}' $tell > death.dat
+
+gnuplot -p << EOF
+set autoscale
+set style line 1 lt 1 lw 3 pt 3 linecolor rgb "red"
+set xlabel "Days"
+set ylabel "Δ"
+set title "Δ Cases $2 by Page Telegram"
+set term png
+set output "$2.png"
+plot "cases.dat"  # using 1:2 w points title "cases"
+pause -1
+EOF
+
+#gnuplot -p << EOF
+#set autoscale
+#set style line 1 lt 1 lw 3 pt 3 linecolor rgb "red"
+#set xlabel "Days"
+#set ylabel "Δ"
+#set title " Δ Deaths $2 by Page Telegram"
+#plot "death.dat"  # using 1:2 w points title "deaths"
+#pause -1
+#EOF
+
